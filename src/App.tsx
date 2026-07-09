@@ -131,16 +131,6 @@ interface Coordinator {
   image_url?: string;
 }
 
-const getCommitteeMemberEmail = (member: CommitteeMember) => {
-  if (member.image_url && member.image_url.includes('mailto:')) {
-    return member.image_url.split('mailto:')[1];
-  }
-  let cleanName = member.name.replace(/^(Dr\.|Thiru\.|Mr\.|Mrs\.|Prof\.)\s+/i, '');
-  cleanName = cleanName.toLowerCase().trim().replace(/[\s&()\/]+/g, '.').replace(/\.+/g, '.');
-  const isSnr = member.desc && member.desc.toLowerCase().includes('snr');
-  const domain = isSnr ? 'snrst.org' : 'srec.ac.in';
-  return `${cleanName}@${domain}`;
-};
 
 
 const parseDateDisplay = (dateStr: string) => {
