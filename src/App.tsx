@@ -40,8 +40,6 @@ import acLogo from './assets/ac.png';
 import srecLogo from './assets/srec-logo.png';
 import chatbotIcon from './assets/chatbot.gif';
 import heroBg from './assets/hero.png';
-import narendranImg from './assets/narendran.png';
-import principalImg from './assets/principal.png';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import ExplorePage from './ExplorePage';
 import AdminPage from './AdminPage';
