@@ -41,6 +41,7 @@ import srecLogo from './assets/srec-logo.png';
 import chatbotIcon from './assets/chatbot.gif';
 import heroBg from './assets/hero.png';
 import karpagamImg from './assets/karpagam.png';
+import jansiImg from './assets/jansi.png';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import ExplorePage from './ExplorePage';
 import AdminPage from './AdminPage';
@@ -1526,6 +1527,7 @@ export default function App() {
 
   const getMemberImage = (name: string, imageUrl?: string) => {
     if (name.includes('Karpagam')) return karpagamImg;
+    if (name.includes('Jansi')) return jansiImg;
     return imageUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0f52ba,06b6d4,f58220`;
   };
 
