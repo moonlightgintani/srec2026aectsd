@@ -2549,6 +2549,7 @@ export default function App() {
                       lineHeight: 1.5,
                       margin: 0
                     }}>
+                      {evt.desc}
                     </p>
                   </motion.div>
                 );
