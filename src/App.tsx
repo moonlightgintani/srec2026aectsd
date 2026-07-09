@@ -40,7 +40,6 @@ import acLogo from './assets/ac.png';
 import srecLogo from './assets/srec-logo.png';
 import chatbotIcon from './assets/chatbot.gif';
 import heroBg from './assets/hero.png';
-import principalImg from './assets/principal.png';
 import karpagamImg from './assets/karpagam.png';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import ExplorePage from './ExplorePage';
@@ -2550,10 +2549,10 @@ export default function App() {
                       lineHeight: 1.5,
                       margin: 0
                     }}>
-                      {evt.desc}
                     </p>
                   </motion.div>
                 );
+              });
             })()}
           </div>
         </div>
