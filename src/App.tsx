@@ -40,6 +40,8 @@ import acLogo from './assets/ac.png';
 import srecLogo from './assets/srec-logo.png';
 import chatbotIcon from './assets/chatbot.gif';
 import heroBg from './assets/hero.png';
+import principalImg from './assets/principal.png';
+import karpagamImg from './assets/karpagam.png';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import ExplorePage from './ExplorePage';
 import AdminPage from './AdminPage';
@@ -1523,10 +1525,10 @@ export default function App() {
     return text;
   };
 
-  function getMemberImage(name: string, imageUrl?: string): string {
-    if (name.includes('Karpagam')) return 'https://srec.ac.in/uploads/Faculty/whatsappimage2023-08-05at9.46.42am(1)230816083910.jpeg';
+  const getMemberImage = (name: string, imageUrl?: string) => {
+    if (name.includes('Karpagam')) return karpagamImg;
     return imageUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0f52ba,06b6d4,f58220`;
-  }
+  };
 
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: '100vh', background: 'var(--bg-deep)' }}>
@@ -3328,9 +3330,9 @@ export default function App() {
                       <div key={cidx} style={{ borderRadius: '0.75rem', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.03)', display: 'flex', flexDirection: 'column' }}>
                         {/* Box Image Area — no overlay badge */}
                         <div style={{ position: 'relative', width: '100%', aspectRatio: '4/3', overflow: 'hidden', flexShrink: 0 }}>
-                          {coord.image_url ? (
+                          {getMemberImage(coord.name, coord.image_url) && !getMemberImage(coord.name, coord.image_url).includes('dicebear') ? (
                             <img
-                              src={coord.image_url}
+                              src={getMemberImage(coord.name, coord.image_url)}
                               alt={coord.name}
                               style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top' }}
                             />
