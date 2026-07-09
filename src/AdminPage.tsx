@@ -3213,6 +3213,7 @@ export default function AdminPage({
               <X size={16} />
             </button>
             {(() => {
+              const reg = submittedRegistrations.find(r => r.screenshot_name === previewImage || (r.screenshot_name && previewImage && previewImage.includes(r.screenshot_name)));
               const isUrl = previewImage.startsWith('http') || previewImage.startsWith('data:');
               // If it's just a filename, try to get the public URL from the payment-proofs bucket
               const imageUrl = isUrl
