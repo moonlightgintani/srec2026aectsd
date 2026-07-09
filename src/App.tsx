@@ -38,8 +38,6 @@ import { SrecLogo } from './components/SrecLogo';
 import Footer from './components/Footer';
 import acLogo from './assets/ac.png';
 import srecLogo from './assets/srec-logo.png';
-import narendranImg from './assets/narendran.png';
-import principalImg from './assets/principal.png';
 import chatbotIcon from './assets/chatbot.gif';
 import heroBg from './assets/hero.png';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
@@ -133,7 +131,12 @@ interface Coordinator {
   image_url?: string;
 }
 
-
+const getMemberImage = (name: string, imageUrl?: string) => {
+  if (name.includes('Narendran')) return narendranImg;
+  if (name.includes('Soundarrajan')) return principalImg;
+  if (name.includes('Karpagam')) return 'https://srec.ac.in/uploads/Faculty/jan240816094910.png';
+  return imageUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0f52ba,06b6d4,f58220`;
+};
 
 const parseDateDisplay = (dateStr: string) => {
   const cleaned = dateStr.trim();
@@ -1526,6 +1529,10 @@ export default function App() {
     return text;
   };
 
+  function getMemberImage(_name: string, _image_url: string): string {
+    throw new Error('Function not implemented.');
+  }
+
   return (
     <div style={{ position: 'relative', width: '100%', minHeight: '100vh', background: 'var(--bg-deep)' }}>
       {/* Background Grids and Overlays */}
@@ -2115,7 +2122,7 @@ export default function App() {
                         <div key={mIdx} className="member-profile-card">
                           <div className="member-avatar-wrapper">
                             <img 
-                              src={member.name.includes('Narendran') ? narendranImg : member.name.includes('Soundarrajan') ? principalImg : member.image_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(member.name)}&backgroundColor=0f52ba,06b6d4,f58220`}
+                              src={getMemberImage(member.name, member.image_url)}
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(member.name)}&backgroundColor=0f52ba,06b6d4,f58220`;
                               }}
@@ -2242,7 +2249,7 @@ export default function App() {
                             <div key={mIdx} className="member-profile-card">
                               <div className="member-avatar-wrapper">
                                 <img 
-                                  src={member.name.includes('Narendran') ? narendranImg : member.name.includes('Soundarrajan') ? principalImg : member.image_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(member.name)}&backgroundColor=0f52ba,06b6d4,f58220`}
+                                  src={getMemberImage(member.name, member.image_url)}
                                   onError={(e) => {
                                     (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(member.name)}&backgroundColor=0f52ba,06b6d4,f58220`;
                                   }}
@@ -2286,7 +2293,7 @@ export default function App() {
                       <div key={index} className="member-profile-card">
                         <div className="member-avatar-wrapper">
                           <img 
-                            src={adviser.name.includes('Narendran') ? narendranImg : adviser.name.includes('Soundarrajan') ? principalImg : adviser.image_url || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(adviser.name)}&backgroundColor=0f52ba,06b6d4,f58220`}
+                            src={getMemberImage(adviser.name, adviser.image_url)}
                             onError={(e) => {
                               (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(adviser.name)}&backgroundColor=0f52ba,06b6d4,f58220`;
                             }}
