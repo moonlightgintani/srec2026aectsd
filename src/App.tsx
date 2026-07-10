@@ -42,6 +42,9 @@ import chatbotIcon from './assets/chatbot.gif';
 import heroBg from './assets/hero.png';
 import karpagamImg from './assets/karpagam.png';
 import jansiImg from './assets/jansi.png';
+import narendranImg from './assets/Narendran.png';
+import logo2 from './assets/logo2.png';
+import principalImg from './assets/principal.png';
 import { supabase, isSupabaseConfigured } from './supabaseClient';
 import ExplorePage from './ExplorePage';
 import AdminPage from './AdminPage';
@@ -1525,10 +1528,85 @@ export default function App() {
     return text;
   };
 
-  const getMemberImage = (name: string, imageUrl?: string) => {
+  /**
+   * Returns the best available image for a committee member.
+   * Priority: local asset → DB image_url → dicebear initials avatar
+   *
+   * TO ADD A PHOTO: save the image to src/assets/, import it at the top of App.tsx,
+   * then uncomment the matching line below.
+   */
+  const getMemberImage = (name: string, imageUrl?: string): string => {
+    // ── ORGANIZING: Chief Patrons ──────────────────────────────────────
+    if (name.includes('Sundar Ramakrishnan') || name.includes('R. Sundar')) return logo2;
+    if (name.includes('S. Narendran')) return narendranImg;
+
+    // ── ORGANIZING: General Chairs ────────────────────────────────────
+    if (name.includes('Soundarrajan')) return principalImg;
+    // if (name.includes('P. Sakthivel'))   return sakthivelImg;    // add sakthivel.png to assets
+    // if (name.includes('S. Radha'))       return radhaImg;         // add radha.png to assets
+    // if (name.includes('S. Brindha'))     return brindhaImg;       // add brindha.png to assets
+
+    // ── ORGANIZING: Conference / Session Chairs ────────────────────────
     if (name.includes('Karpagam')) return karpagamImg;
+    // if (name.includes('Kingsy Grace'))   return kingsyImg;        // add kingsy.png to assets
+
+    // ── ORGANIZING: Finance ───────────────────────────────────────────
+    // if (name.includes('Balamurugan'))    return balamuruganImg;   // add balamurugan.png to assets
+    // if (name.includes('Praveenkumar') || name.includes('Praveen Kumar')) return praveenkumarImg;
+
+    // ── ORGANIZING: Publication ───────────────────────────────────────
     if (name.includes('Jansi')) return jansiImg;
-    return imageUrl || `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0f52ba,06b6d4,f58220`;
+    // if (name.includes('Aravindaguru'))   return aravindaguruImg;
+    // if (name.includes('Sowntharya'))     return sowntharImage;
+    // if (name.includes('N. Saranya'))     return saranyaImg;
+    // if (name.includes('Vishnu Vardhan')) return vishnuVardhanImg;
+
+    // ── ORGANIZING: Local Arrangements ───────────────────────────────
+    // if (name.includes('Deepa B Prabhu')) return deepaImg;
+    // if (name.includes('V. Radhika'))     return radhikaImg;
+    // if (name.includes('Marisekar'))      return marisekarImg;
+    // if (name.includes('Logaprakash'))    return logaprakashImg;
+
+    // ── ORGANIZING: Registration ──────────────────────────────────────
+    // if (name.includes('H. Vidhya'))      return vidhyaImg;
+    // if (name.includes('T. Anitha'))      return anithaImg;
+    // if (name.includes('M. Jaishree'))    return jaishreeImg;
+    // if (name.includes('R. S. Ramya'))    return ramyaImg;
+    // if (name.includes('Jeevanandham'))   return jeevanandhamImg;
+    // if (name.includes('Divyalakshmi'))   return divyalakshmiImg;
+
+    // ── ORGANIZING: Website & Outreach ───────────────────────────────
+    // if (name.includes('Vishnu Durai'))   return vishnuDuraiImg;
+    // if (name.includes('Robin Johny'))    return robinJohnyImg;
+    // if (name.includes('G. Narendran'))   return gNarendranImg;
+
+    // ── ORGANIZING: Hospitality ───────────────────────────────────────
+    // if (name.includes('P. Perumal'))     return perumalImg;
+    // if (name.includes('Nagarajapandian'))return nagarajapandianImg;
+    // if (name.includes('Krishna Kumar'))  return krishnaKumarImg;
+
+    // ── ORGANIZING: General Members ───────────────────────────────────
+    // if (name.includes('N. Divya'))       return divyaImg;
+    // if (name.includes('R. Kiruba'))      return kirubaImg;
+    // if (name.includes('S. P. Vimal'))    return vimalImg;
+    // if (name.includes('Selva Kumar'))    return selvaKumarImg;
+    // if (name.includes('Rajalakshmi'))    return rajalakshmiImg;
+    // if (name.includes('G. Lavanya'))     return lavanyaImg;
+
+    // ── STEERING COMMITTEE ────────────────────────────────────────────
+    // if (name.includes('N. Susila'))          return susilaImg;
+    // if (name.includes('Geetha Devasena'))    return geethaImg;
+    // if (name.includes('Grace Selvarani'))    return graceSelvaraniImg;
+    // if (name.includes('R. Shanmugasundaram'))return shanmugasundaramImg;
+    // if (name.includes('S. Allirani'))        return alliraniImg;
+    // if (name.includes('Jagadeeswari'))       return jagadeeswariImg;
+    // if (name.includes('N. Sathish Kumar'))   return sathishKumarImg;
+
+    // ── Fallback: DB image_url (Supabase hosted), then dicebear initials ──
+    if (imageUrl && imageUrl.startsWith('http') && !imageUrl.includes('drive.google.com')) {
+      return imageUrl;
+    }
+    return `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}&backgroundColor=0f52ba,06b6d4,f58220`;
   };
 
   return (
@@ -5691,215 +5769,172 @@ export default function App() {
       </AnimatePresence>
 
       {/* Payment Proof Receipt Image Preview Modal */}
-      {previewImage && (
-        <div 
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            background: 'rgba(15, 23, 42, 0.6)',
-            backdropFilter: 'blur(4px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999,
-            padding: '1.5rem',
-            boxSizing: 'border-box'
-          }}
-          onClick={() => setPreviewImage(null)}
-        >
-          <div 
+      {previewImage && (() => {
+        const reg = submittedRegistrations.find(r => r.screenshot_name === previewImage);
+        const isDirectUrl = previewImage.startsWith('http') || previewImage.startsWith('data:');
+
+        // Resolve the public URL from Supabase storage bucket
+        let resolvedUrl: string | null = null;
+        if (isDirectUrl) {
+          resolvedUrl = previewImage;
+        } else if (isSupabaseConfigured && supabase) {
+          const { data } = supabase.storage.from('payment-proofs').getPublicUrl(previewImage);
+          resolvedUrl = data?.publicUrl || null;
+        }
+
+        const isPdf = previewImage.toLowerCase().endsWith('.pdf');
+
+        return (
+          <div
             style={{
-              background: '#ffffff',
-              borderRadius: '0.75rem',
-              padding: '1.5rem',
-              maxWidth: '90%',
-              maxHeight: '90%',
-              position: 'relative',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              position: 'fixed',
+              top: 0, left: 0, right: 0, bottom: 0,
+              background: 'rgba(15, 23, 42, 0.75)',
+              backdropFilter: 'blur(6px)',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
-              gap: '1rem'
+              justifyContent: 'center',
+              zIndex: 9999,
+              padding: '1.5rem',
+              boxSizing: 'border-box'
             }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={() => setPreviewImage(null)}
           >
-            <button
-              onClick={() => setPreviewImage(null)}
+            <div
               style={{
-                position: 'absolute',
-                top: '0.5rem',
-                right: '0.5rem',
-                background: '#f1f5f9',
-                border: 'none',
-                borderRadius: '50%',
-                width: '32px',
-                height: '32px',
+                background: '#ffffff',
+                borderRadius: '1rem',
+                padding: '1.5rem',
+                maxWidth: '92vw',
+                maxHeight: '92vh',
+                width: isPdf ? '700px' : 'auto',
+                position: 'relative',
+                boxShadow: '0 30px 60px -12px rgba(0,0,0,0.35)',
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
-                cursor: 'pointer',
-                color: '#64748b'
+                gap: '1rem',
+                overflow: 'hidden'
               }}
-              title="Close Preview"
+              onClick={e => e.stopPropagation()}
             >
-              <X size={16} />
-            </button>
-            {(() => {
-              const reg = submittedRegistrations.find(r => r.screenshot_name === previewImage);
-              const isUrl = previewImage.startsWith('http') || previewImage.startsWith('data:');
-              if (isUrl) {
-                return (
-                  <>
-                    <img 
-                      src={previewImage} 
-                      alt="Payment Proof Receipt" 
-                      style={{
-                        maxWidth: '100%',
-                        maxHeight: '70vh',
-                        objectFit: 'contain',
-                        borderRadius: '0.375rem',
-                        border: '1px solid #cbd5e1'
-                      }}
-                    />
-                    <div style={{ display: 'flex', gap: '0.75rem', width: '100%', justifyContent: 'center', marginTop: '1rem' }}>
-                      <a 
-                        href={previewImage} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        style={{ 
-                          display: 'inline-flex', 
-                          alignItems: 'center', 
-                          gap: '0.35rem', 
-                          fontSize: '0.8rem',
-                          padding: '0.5rem 1rem',
-                          textDecoration: 'none',
-                          color: '#ffffff',
-                          background: '#3b82f6',
-                          borderRadius: '0.375rem',
-                          fontWeight: 600
-                        }}
-                      >
-                        <Download size={14} /> Open in New Tab
-                      </a>
-                      <button
-                        onClick={() => setPreviewImage(null)}
-                        style={{ 
-                          fontSize: '0.8rem',
-                          padding: '0.5rem 1rem',
-                          background: '#e2e8f0',
-                          color: '#475569',
-                          border: 'none',
-                          borderRadius: '0.375rem',
-                          fontWeight: 600,
-                          cursor: 'pointer'
-                        }}
-                      >
-                        Close Preview
-                      </button>
+              {/* Header */}
+              <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e2e8f0', paddingBottom: '0.75rem' }}>
+                <div>
+                  <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 800, color: '#0f172a' }}>Payment Proof</h3>
+                  {reg && (
+                    <p style={{ margin: '0.15rem 0 0', fontSize: '0.75rem', color: '#64748b' }}>
+                      {reg.author_name} · {reg.paper_id || 'N/A'} · {reg.email}
+                    </p>
+                  )}
+                </div>
+                <button
+                  onClick={() => setPreviewImage(null)}
+                  style={{
+                    background: '#f1f5f9', border: 'none', borderRadius: '50%',
+                    width: '34px', height: '34px', display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', cursor: 'pointer', color: '#475569', flexShrink: 0
+                  }}
+                  title="Close Preview"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* Image / PDF body */}
+              {resolvedUrl ? (
+                isPdf ? (
+                  <iframe
+                    src={resolvedUrl}
+                    title="Payment Proof PDF"
+                    style={{ width: '100%', height: '65vh', border: 'none', borderRadius: '0.5rem' }}
+                  />
+                ) : (
+                  <img
+                    src={resolvedUrl}
+                    alt="Payment Proof"
+                    style={{
+                      maxWidth: '100%',
+                      maxHeight: '65vh',
+                      objectFit: 'contain',
+                      borderRadius: '0.5rem',
+                      border: '1px solid #e2e8f0'
+                    }}
+                    onError={e => {
+                      // If image fails to load, show a styled error placeholder
+                      (e.target as HTMLImageElement).style.display = 'none';
+                      const parent = (e.target as HTMLImageElement).parentElement;
+                      if (parent) {
+                        const msg = document.createElement('div');
+                        msg.style.cssText = 'padding:2rem;text-align:center;color:#64748b;font-size:0.85rem;';
+                        msg.textContent = '⚠️ Image could not be loaded. It may have been deleted or is not publicly accessible.';
+                        parent.appendChild(msg);
+                      }
+                    }}
+                  />
+                )
+              ) : (
+                /* No Supabase / can't resolve URL — show styled receipt card */
+                <div style={{
+                  width: '300px',
+                  background: 'linear-gradient(135deg, #f8fafc 0%, #fff 100%)',
+                  border: '1.5px dashed #cbd5e1',
+                  borderRadius: '0.75rem',
+                  padding: '1.5rem',
+                  fontFamily: 'monospace',
+                  color: '#1e293b',
+                  lineHeight: 1.6,
+                  textAlign: 'center'
+                }}>
+                  <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🧾</div>
+                  <p style={{ fontWeight: 700, margin: '0 0 0.25rem', fontSize: '0.9rem' }}>AECTSD 2027</p>
+                  <p style={{ fontSize: '0.72rem', color: '#64748b', margin: '0 0 1rem' }}>PAYMENT PROOF ON FILE</p>
+                  <p style={{ fontSize: '0.78rem', wordBreak: 'break-all', background: '#f1f5f9', padding: '0.5rem', borderRadius: '0.25rem', margin: 0 }}>
+                    {previewImage}
+                  </p>
+                  {reg && (
+                    <div style={{ fontSize: '0.75rem', color: '#475569', marginTop: '1rem', textAlign: 'left' }}>
+                      <p style={{ margin: '0.15rem 0' }}><strong>Author:</strong> {reg.author_name}</p>
+                      <p style={{ margin: '0.15rem 0' }}><strong>Email:</strong> {reg.email}</p>
+                      <p style={{ margin: '0.15rem 0' }}><strong>Paper ID:</strong> {reg.paper_id || 'N/A'}</p>
                     </div>
-                  </>
-                );
-              }
-              
-              // Render realistic billing receipt card
-              return (
-                <>
-                  <div style={{
-                    width: '320px',
-                    background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 100%)',
-                    border: '1.5px solid #e2e8f0',
-                    borderRadius: '0.75rem',
-                    padding: '1.5rem',
-                    boxShadow: '0 10px 25px rgba(0,0,0,0.05)',
-                    fontFamily: 'monospace',
-                    color: '#1e293b',
-                    lineHeight: '1.5'
-                  }}>
-                    <div style={{ textAlign: 'center', borderBottom: '2px dashed #cbd5e1', paddingBottom: '1rem', marginBottom: '1rem' }}>
-                      <h4 style={{ margin: '0 0 0.25rem 0', color: '#0f172a', fontWeight: 800, fontSize: '1.1rem' }}>AECTSD 2027</h4>
-                      <span style={{ fontSize: '0.75rem', color: '#64748b' }}>PAYMENT PROOF RECEIPT</span>
-                      <div style={{
-                        marginTop: '0.75rem',
-                        background: '#ecfdf5',
-                        color: '#059669',
-                        border: '1px solid #a7f3d0',
-                        padding: '0.25rem 0.75rem',
-                        borderRadius: '9999px',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        display: 'inline-block'
-                      }}>
-                        VERIFIED SUCCESSFUL
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontSize: '0.8rem' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#64748b' }}>FILE NAME:</span>
-                        <span style={{ fontWeight: 600, wordBreak: 'break-all' }}>{previewImage}</span>
-                      </div>
-                      {reg && (
-                        <>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: '#64748b' }}>AUTHOR:</span>
-                            <span style={{ fontWeight: 600 }}>{reg.author_name}</span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: '#64748b' }}>EMAIL:</span>
-                            <span style={{ fontWeight: 600 }}>{reg.email}</span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: '#64748b' }}>PHONE:</span>
-                            <span style={{ fontWeight: 600 }}>{reg.phone}</span>
-                          </div>
-                          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                            <span style={{ color: '#64748b' }}>PAPER ID:</span>
-                            <span style={{ fontWeight: 600 }}>{reg.paper_id}</span>
-                          </div>
-                        </>
-                      )}
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#64748b' }}>STATUS:</span>
-                        <span style={{ fontWeight: 600 }}>OFFLINE VERIFIED</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#64748b' }}>BANK REF:</span>
-                        <span style={{ fontWeight: 600 }}>TXN-902341852</span>
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ color: '#64748b' }}>TIME:</span>
-                        <span style={{ fontWeight: 600 }}>{new Date().toLocaleString()}</span>
-                      </div>
-                    </div>
-                    <div style={{ borderTop: '2px dashed #cbd5e1', marginTop: '1rem', paddingTop: '1rem', textAlign: 'center', fontSize: '0.75rem', color: '#64748b' }}>
-                      Sri Ramakrishna Engineering College
-                    </div>
-                  </div>
-                  <div style={{ display: 'flex', gap: '0.75rem', width: '100%', justifyContent: 'center', marginTop: '1rem' }}>
-                    <button
-                      onClick={() => setPreviewImage(null)}
-                      style={{ 
-                        fontSize: '0.8rem',
-                        padding: '0.5rem 1rem',
-                        background: '#e2e8f0',
-                        color: '#475569',
-                        border: 'none',
-                        borderRadius: '0.375rem',
-                        fontWeight: 600,
-                        cursor: 'pointer'
-                      }}
-                    >
-                      Close Preview
-                    </button>
-                  </div>
-                </>
-              );
-            })()}
+                  )}
+                </div>
+              )}
+
+              {/* Action buttons */}
+              <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center', width: '100%' }}>
+                {resolvedUrl && (
+                  <a
+                    href={resolvedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      display: 'inline-flex', alignItems: 'center', gap: '0.35rem',
+                      fontSize: '0.8rem', padding: '0.5rem 1rem', textDecoration: 'none',
+                      color: '#ffffff', background: '#3b82f6', borderRadius: '0.375rem', fontWeight: 600
+                    }}
+                  >
+                    <Download size={14} /> Open / Download
+                  </a>
+                )}
+                <button
+                  onClick={() => setPreviewImage(null)}
+                  style={{
+                    fontSize: '0.8rem', padding: '0.5rem 1rem',
+                    background: '#e2e8f0', color: '#475569',
+                    border: 'none', borderRadius: '0.375rem',
+                    fontWeight: 600, cursor: 'pointer'
+                  }}
+                >
+                  Close
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
+
 
       {/* Nexus Agent Chatbot Floating Widget */}
       <div className="nexus-chat-container">
