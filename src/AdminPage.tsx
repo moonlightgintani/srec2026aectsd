@@ -19,7 +19,8 @@ import {
   Activity,
   Briefcase,
   Eye,
-  X
+  X,
+  Menu
 } from 'lucide-react';
 
 const ADMIN_MASTER_KEY = "MRBB2026";
@@ -159,6 +160,7 @@ export default function AdminPage({
   // Tab state
   const [activeTab, setActiveTab] = useState<string>('registrations');
   const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(false);
 
   // Search & Filter
   const [searchTerm, setSearchTerm] = useState<string>('');
@@ -1510,41 +1512,78 @@ export default function AdminPage({
   }
 
   return (
-    <div className="admin-layout" style={{
-      minHeight: '100vh',
-      width: '100%',
-      display: 'flex',
-      background: '#f8fafc',
-      color: '#0f172a',
-      fontFamily: 'Inter, system-ui, sans-serif'
-    }}>
+    <div className="admin-layout">
+      {/* Mobile Top Header */}
+      <header className="admin-header">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            style={{
+              background: '#f1f5f9',
+              border: 'none',
+              borderRadius: '0.375rem',
+              padding: '0.5rem',
+              cursor: 'pointer',
+              color: '#334155',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            title="Toggle Sidebar"
+          >
+            {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Shield size={18} style={{ color: '#2563eb' }} />
+            <span style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a' }}>Admin Portal</span>
+          </div>
+        </div>
+        <button
+          onClick={() => {
+            if (onClose) onClose();
+            else window.location.hash = '#/';
+          }}
+          style={{
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            padding: '0.4rem 0.8rem',
+            background: '#eff6ff',
+            color: '#2563eb',
+            border: 'none',
+            borderRadius: '0.375rem',
+            cursor: 'pointer'
+          }}
+        >
+          Exit
+        </button>
+      </header>
+
+      {/* Sidebar Backdrop Overlay on Mobile */}
+      {sidebarOpen && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: 'fixed',
+            top: '70px',
+            left: 0,
+            right: 0,
+            bottom: 0,
+            background: 'rgba(15, 23, 42, 0.4)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 998
+          }}
+        />
+      )}
+
       {/* Sidebar Navigation */}
-      <div className="admin-sidebar" style={{
-        width: '260px',
-        background: '#0f172a',
-        color: '#ffffff',
-        display: 'flex',
-        flexDirection: 'column',
-        flexShrink: 0
-      }}>
+      <div className={`admin-sidebar ${sidebarOpen ? 'admin-sidebar-open' : ''}`} style={{ top: '70px' }}>
         {/* Sidebar Header */}
-        <div style={{
-          padding: '1.5rem',
-          borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '0.75rem'
-        }}>
-          <div style={{
-            background: 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)',
-            padding: '0.5rem',
-            borderRadius: '0.5rem',
-            color: '#ffffff'
-          }}>
+        <div className="admin-sidebar-header">
+          <div className="admin-sidebar-logo-box">
             <Shield size={20} />
           </div>
           <div>
-            <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800 }}>SREC Admin Portal</h4>
+            <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 800 }}>SREC Admin</h4>
             <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>AECTSD 2027 Console</span>
           </div>
         </div>
@@ -1561,14 +1600,7 @@ export default function AdminPage({
         </div>
 
         {/* Tab Selection Navigation */}
-        <nav style={{
-          flex: 1,
-          padding: '1.25rem 0.75rem',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.25rem',
-          overflowY: 'auto'
-        }}>
+        <nav className="admin-sidebar-nav">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
             return (
@@ -1577,23 +1609,9 @@ export default function AdminPage({
                 onClick={() => {
                   setActiveTab(tab.id);
                   setSearchTerm('');
+                  setSidebarOpen(false);
                 }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.75rem',
-                  width: '100%',
-                  padding: '0.75rem 1rem',
-                  border: 'none',
-                  borderRadius: '0.5rem',
-                  background: isActive ? '#3b82f6' : 'transparent',
-                  color: isActive ? '#ffffff' : '#94a3b8',
-                  fontSize: '0.85rem',
-                  fontWeight: 600,
-                  cursor: 'pointer',
-                  textAlign: 'left',
-                  transition: 'all 0.2s ease'
-                }}
+                className={`admin-sidebar-link ${isActive ? 'active' : ''}`}
               >
                 {tab.icon}
                 {tab.label}
@@ -1603,13 +1621,7 @@ export default function AdminPage({
         </nav>
 
         {/* Sidebar Footer Operations */}
-        <div style={{
-          padding: '1rem',
-          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '0.5rem'
-        }}>
+        <div className="admin-sidebar-footer">
           <button
             onClick={handleRefresh}
             style={{
@@ -1660,7 +1672,7 @@ export default function AdminPage({
             style={{
               width: '100%',
               padding: '0.6rem',
-              background: '#3b82f6',
+              background: '#2563eb',
               color: '#ffffff',
               border: 'none',
               borderRadius: '0.375rem',
@@ -1671,7 +1683,7 @@ export default function AdminPage({
               alignItems: 'center',
               justifyContent: 'center',
               gap: '0.5rem',
-              boxShadow: '0 4px 10px rgba(59, 130, 246, 0.2)'
+              boxShadow: '0 4px 10px rgba(37, 99, 235, 0.2)'
             }}
           >
             <ArrowLeft size={14} /> Return to Site
@@ -1679,60 +1691,42 @@ export default function AdminPage({
         </div>
       </div>
 
-      {/* Main Content Workspace */}
-      <main style={{
-        flex: 1,
-        padding: '2.5rem',
-        overflowY: 'auto',
-        boxSizing: 'border-box'
-      }}>
-        {/* Workspace Title Card */}
-        <div style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '2rem'
-        }}>
-          <div>
-            <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0, letterSpacing: '-0.025em' }}>
-              {tabs.find(t => t.id === activeTab)?.label}
-            </h1>
-            <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0.25rem 0 0 0' }}>
-              Database manager and interactive panel for SREC webpage components.
-            </p>
-          </div>
-          
-          {/* Global Search Bar */}
-          {['registrations', 'speakers', 'tracks', 'committee', 'workshops', 'coordinators', 'milestones'].includes(activeTab) && (
-            <div style={{ position: 'relative', width: '280px' }}>
-              <Search size={16} style={{ position: 'absolute', left: '0.75rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
-              <input
-                type="text"
-                placeholder={`Search list...`}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '0.5rem 1rem 0.5rem 2.2rem',
-                  fontSize: '0.85rem',
-                  border: '1px solid #cbd5e1',
-                  borderRadius: '0.375rem',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                  background: '#ffffff'
-                }}
-              />
+      {/* Main Content Workspace Wrapper */}
+      <div className="admin-main-container">
+        <main className="admin-content">
+          {/* Workspace Title Card */}
+          <div className="admin-view-title-card">
+            <div>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 800, margin: 0, letterSpacing: '-0.025em', color: '#0f172a' }}>
+                {tabs.find(t => t.id === activeTab)?.label}
+              </h1>
+              <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0.25rem 0 0 0' }}>
+                Database manager and interactive panel for SREC webpage components.
+              </p>
             </div>
-          )}
-        </div>
+            
+            {/* Global Search Bar */}
+            {['registrations', 'speakers', 'tracks', 'committee', 'workshops', 'coordinators', 'milestones'].includes(activeTab) && (
+              <div className="admin-search-container">
+                <Search size={16} style={{ position: 'absolute', left: '0.85rem', top: '50%', transform: 'translateY(-50%)', color: '#94a3b8' }} />
+                <input
+                  type="text"
+                  placeholder={`Search list...`}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="admin-search-input"
+                />
+              </div>
+            )}
+          </div>
 
         {/* Dashboard Tab Panels */}
         
         {/* TAB 1: Registrations Log */}
         {activeTab === 'registrations' && (
-          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.75rem', padding: '1.5rem', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.02)' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-              <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>Submitted Forms ({submittedRegistrations.length})</h3>
+          <div className="admin-glass-card" style={{ padding: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: '#0f172a' }}>Submitted Forms ({submittedRegistrations.length})</h3>
               {submittedRegistrations.length > 0 && (
                 <button
                   onClick={handleClearAllRegistrations}
@@ -1743,13 +1737,49 @@ export default function AdminPage({
                     padding: '0.5rem 1rem',
                     borderRadius: '0.375rem',
                     fontSize: '0.8rem',
-                    fontWeight: 600,
-                    cursor: 'pointer'
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    transition: 'all 0.2s'
                   }}
+                  onMouseOver={(e) => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.15)')}
+                  onMouseOut={(e) => (e.currentTarget.style.background = 'rgba(239, 68, 68, 0.08)')}
                 >
                   Clear All Logs
                 </button>
               )}
+            </div>
+
+            {/* Stats Row */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1.25rem', marginBottom: '2rem' }}>
+              <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '0.75rem', padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ background: '#3b82f6', color: '#ffffff', padding: '0.65rem', borderRadius: '0.5rem', display: 'flex' }}>
+                  <Database size={20} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.725rem', fontWeight: 800, color: '#1e40af', letterSpacing: '0.05em' }}>TOTAL REGISTRATIONS</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#1d4ed8', marginTop: '0.15rem' }}>{submittedRegistrations.length}</div>
+                </div>
+              </div>
+              
+              <div style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '0.75rem', padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ background: '#d97706', color: '#ffffff', padding: '0.65rem', borderRadius: '0.5rem', display: 'flex' }}>
+                  <Calendar size={20} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.725rem', fontWeight: 800, color: '#92400e', letterSpacing: '0.05em' }}>TOUR ATENDEES</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#b45309', marginTop: '0.15rem' }}>{submittedRegistrations.filter(r => r.register_for_tour).length}</div>
+                </div>
+              </div>
+
+              <div style={{ background: '#ecfdf5', border: '1px solid #a7f3d0', borderRadius: '0.75rem', padding: '1.25rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                <div style={{ background: '#10b981', color: '#ffffff', padding: '0.65rem', borderRadius: '0.5rem', display: 'flex' }}>
+                  <Shield size={20} />
+                </div>
+                <div>
+                  <div style={{ fontSize: '0.725rem', fontWeight: 800, color: '#065f46', letterSpacing: '0.05em' }}>PROOF ATTACHMENTS</div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 800, color: '#047857', marginTop: '0.15rem' }}>{submittedRegistrations.filter(r => r.screenshot_name && r.screenshot_name !== 'no_file').length}</div>
+                </div>
+              </div>
             </div>
 
             {submittedRegistrations.length === 0 ? (
@@ -1760,16 +1790,16 @@ export default function AdminPage({
             ) : (
               <>
                 {/* Desktop view */}
-                <div className="admin-desktop-view" style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
+                <div className="admin-desktop-view" style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '0.5rem' }}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left', background: '#ffffff' }}>
                     <thead>
-                      <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#475569', fontWeight: 700 }}>
-                        <th style={{ padding: '0.75rem' }}>Date</th>
-                        <th style={{ padding: '0.75rem' }}>Author Details</th>
-                        <th style={{ padding: '0.75rem' }}>Paper Info</th>
-                        <th style={{ padding: '0.75rem' }}>Tour Details</th>
-                        <th style={{ padding: '0.75rem' }}>Receipt Attachment</th>
-                        <th style={{ padding: '0.75rem', textAlign: 'center' }}>Actions</th>
+                      <tr style={{ borderBottom: '2px solid #e2e8f0', background: '#f8fafc', color: '#475569', fontWeight: 700 }}>
+                        <th style={{ padding: '1rem 0.75rem' }}>Date</th>
+                        <th style={{ padding: '1rem 0.75rem' }}>Author Details</th>
+                        <th style={{ padding: '1rem 0.75rem' }}>Paper Info</th>
+                        <th style={{ padding: '1rem 0.75rem' }}>Tour Details</th>
+                        <th style={{ padding: '1rem 0.75rem' }}>Receipt Attachment</th>
+                        <th style={{ padding: '1rem 0.75rem', textAlign: 'center' }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -1782,25 +1812,29 @@ export default function AdminPage({
                         .map((r, i) => (
                           <tr key={r.id || i} style={{ borderBottom: '1px solid #f1f5f9', verticalAlign: 'top' }}>
                             <td style={{ padding: '1rem 0.75rem', whiteSpace: 'nowrap', color: '#64748b' }}>
-                              {new Date(r.created_at || Date.now()).toLocaleDateString()}<br/>
-                              <span style={{ fontSize: '0.7rem' }}>{new Date(r.created_at || Date.now()).toLocaleTimeString()}</span>
+                              <span style={{ fontWeight: 600, color: '#334155' }}>{new Date(r.created_at || Date.now()).toLocaleDateString()}</span><br/>
+                              <span style={{ fontSize: '0.7rem', color: '#94a3b8' }}>{new Date(r.created_at || Date.now()).toLocaleTimeString()}</span>
                             </td>
                             <td style={{ padding: '1rem 0.75rem' }}>
                               <div style={{ fontWeight: 700, color: '#0f172a' }}>{r.author_name}</div>
-                              <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{r.email}</div>
+                              <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.1rem' }}>
+                                <a href={`mailto:${r.email}`} style={{ color: '#2563eb', textDecoration: 'none' }}>{r.email}</a>
+                              </div>
                               <div style={{ fontSize: '0.75rem', color: '#64748b' }}>{r.phone}</div>
                             </td>
                             <td style={{ padding: '1rem 0.75rem', maxWidth: '260px' }}>
-                              <span style={{ display: 'inline-block', background: 'rgba(59, 130, 246, 0.1)', color: '#1d4ed8', padding: '0.15rem 0.4rem', borderRadius: '0.25rem', fontSize: '0.7rem', fontWeight: 700, marginBottom: '0.25rem' }}>
+                              <span style={{ display: 'inline-block', background: '#eff6ff', border: '1px solid #bfdbfe', color: '#2563eb', padding: '0.15rem 0.4rem', borderRadius: '0.25rem', fontSize: '0.7rem', fontWeight: 700, marginBottom: '0.25rem' }}>
                                 ID: {r.paper_id || 'N/A'}
                               </span>
-                              <div style={{ fontWeight: 600, fontSize: '0.8rem', lineHeight: '1.3' }}>{r.paper_title || 'N/A'}</div>
+                              <div style={{ fontWeight: 600, fontSize: '0.8rem', lineHeight: '1.3', color: '#1e293b' }}>{r.paper_title || 'N/A'}</div>
                             </td>
                             <td style={{ padding: '1rem 0.75rem' }}>
-                              <div style={{ fontWeight: 600 }}>{r.register_for_tour ? '✅ Registered' : '❌ No Tour'}</div>
+                              <div style={{ fontWeight: 700, color: r.register_for_tour ? '#059669' : '#64748b' }}>
+                                {r.register_for_tour ? '✅ Tour Requested' : '❌ No Tour'}
+                              </div>
                               {r.register_for_tour && r.preferred_tour_place && (
-                                <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>
-                                  Choice: {r.preferred_tour_place}
+                                <div style={{ fontSize: '0.75rem', color: '#047857', background: '#ecfdf5', padding: '0.15rem 0.35rem', borderRadius: '0.25rem', display: 'inline-block', marginTop: '0.25rem' }}>
+                                  {r.preferred_tour_place}
                                 </div>
                               )}
                             </td>
@@ -1810,7 +1844,6 @@ export default function AdminPage({
                                   <button
                                     type="button"
                                     onClick={() => {
-                                      // If it's already a full URL, show directly; otherwise get public URL from bucket
                                       if (r.screenshot_name.startsWith('http')) {
                                         setPreviewImage(r.screenshot_name);
                                       } else if (isSupabaseConfigured && supabase) {
@@ -1821,20 +1854,21 @@ export default function AdminPage({
                                       }
                                     }}
                                     style={{
-                                      background: 'none',
-                                      border: 'none',
-                                      padding: 0,
+                                      background: '#f1f5f9',
+                                      border: '1px solid #cbd5e1',
+                                      borderRadius: '0.375rem',
+                                      padding: '0.35rem 0.6rem',
                                       display: 'inline-flex',
                                       alignItems: 'center',
-                                      gap: '0.25rem',
-                                      color: '#3b82f6',
-                                      textDecoration: 'underline',
-                                      fontWeight: 600,
+                                      gap: '0.35rem',
+                                      color: '#2563eb',
+                                      fontWeight: 700,
                                       fontSize: '0.75rem',
-                                      cursor: 'pointer'
+                                      cursor: 'pointer',
+                                      width: 'fit-content'
                                     }}
                                   >
-                                    <Eye size={12} /> {r.screenshot_name}
+                                    <Eye size={12} /> View Proof
                                   </button>
                                 ) : (
                                   <span style={{ color: '#94a3b8', fontSize: '0.75rem' }}>No attachments</span>
@@ -1844,10 +1878,17 @@ export default function AdminPage({
                             <td style={{ padding: '1rem 0.75rem', textAlign: 'center' }}>
                               <button
                                 onClick={() => handleDeleteRegistration(r.id)}
-                                style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.25rem' }}
+                                style={{
+                                  background: 'rgba(239, 68, 68, 0.05)',
+                                  border: '1px solid rgba(239, 68, 68, 0.1)',
+                                  borderRadius: '0.375rem',
+                                  color: '#ef4444',
+                                  cursor: 'pointer',
+                                  padding: '0.4rem'
+                                }}
                                 title="Delete log"
                               >
-                                <Trash2 size={16} />
+                                <Trash2 size={15} />
                               </button>
                             </td>
                           </tr>
@@ -1855,7 +1896,7 @@ export default function AdminPage({
                     </tbody>
                   </table>
                 </div>
-
+ 
                 {/* Mobile view cards */}
                 <div className="admin-mobile-view admin-mobile-card-list">
                   {submittedRegistrations
@@ -1867,7 +1908,9 @@ export default function AdminPage({
                     .map((r, i) => (
                       <div key={r.id || i} className="admin-mobile-card">
                         <div className="admin-mobile-card-header">
-                          <span style={{ fontWeight: 700, color: '#0f52ba', fontSize: '0.9rem' }}>{r.paper_id || 'N/A'}</span>
+                          <span style={{ display: 'inline-block', background: '#eff6ff', border: '1px solid #bfdbfe', color: '#2563eb', padding: '0.15rem 0.45rem', borderRadius: '0.25rem', fontSize: '0.725rem', fontWeight: 800 }}>
+                            ID: {r.paper_id || 'N/A'}
+                          </span>
                           <button 
                             onClick={() => handleDeleteRegistration(r.id)}
                             style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.25rem' }}
@@ -1879,12 +1922,12 @@ export default function AdminPage({
                         <div className="admin-mobile-card-body">
                           <div className="admin-mobile-card-row">
                             <span className="admin-mobile-card-label">Author:</span>
-                            <span className="admin-mobile-card-value" style={{ fontWeight: 600 }}>{r.author_name}</span>
+                            <span className="admin-mobile-card-value" style={{ fontWeight: 700 }}>{r.author_name}</span>
                           </div>
                           <div className="admin-mobile-card-row">
                             <span className="admin-mobile-card-label">Email:</span>
                             <span className="admin-mobile-card-value">
-                              <a href={`mailto:${r.email}`} style={{ color: '#2563eb' }}>{r.email}</a>
+                              <a href={`mailto:${r.email}`} style={{ color: '#2563eb', textDecoration: 'none' }}>{r.email}</a>
                             </span>
                           </div>
                           <div className="admin-mobile-card-row">
@@ -1892,17 +1935,23 @@ export default function AdminPage({
                             <span className="admin-mobile-card-value">{r.phone}</span>
                           </div>
                           <div className="admin-mobile-card-row">
-                            <span className="admin-mobile-card-label">Paper:</span>
-                            <span className="admin-mobile-card-value">{r.paper_title || 'N/A'}</span>
+                            <span className="admin-mobile-card-label">Paper Title:</span>
+                            <span className="admin-mobile-card-value" style={{ color: '#334155' }}>{r.paper_title || 'N/A'}</span>
                           </div>
                           <div className="admin-mobile-card-row">
                             <span className="admin-mobile-card-label">Tour:</span>
                             <span className="admin-mobile-card-value">
-                              {r.register_for_tour ? `✅ Yes (${r.preferred_tour_place || 'No Choice'})` : '❌ No'}
+                              {r.register_for_tour ? (
+                                <span style={{ color: '#059669', background: '#ecfdf5', padding: '0.15rem 0.4rem', borderRadius: '0.25rem', fontSize: '0.75rem', fontWeight: 700 }}>
+                                  ✅ Yes ({r.preferred_tour_place || 'No Choice'})
+                                </span>
+                              ) : (
+                                <span style={{ color: '#64748b' }}>❌ No Tour</span>
+                              )}
                             </span>
                           </div>
                           <div className="admin-mobile-card-row">
-                            <span className="admin-mobile-card-label">Receipt:</span>
+                            <span className="admin-mobile-card-label">Proof URL:</span>
                             <span className="admin-mobile-card-value">
                               {r.screenshot_name && r.screenshot_name !== 'no_file' ? (
                                 <button
@@ -1918,20 +1967,20 @@ export default function AdminPage({
                                     }
                                   }}
                                   style={{
-                                    background: 'none',
-                                    border: 'none',
-                                    padding: 0,
+                                    background: '#eff6ff',
+                                    border: '1px solid #bfdbfe',
+                                    borderRadius: '0.375rem',
+                                    padding: '0.25rem 0.5rem',
                                     display: 'inline-flex',
                                     alignItems: 'center',
                                     gap: '0.25rem',
-                                    color: '#3b82f6',
-                                    textDecoration: 'underline',
-                                    fontWeight: 600,
-                                    fontSize: '0.75rem',
+                                    color: '#2563eb',
+                                    fontWeight: 700,
+                                    fontSize: '0.725rem',
                                     cursor: 'pointer'
                                   }}
                                 >
-                                  <Eye size={12} /> {r.screenshot_name}
+                                  <Eye size={12} /> View Proof
                                 </button>
                               ) : (
                                 <span style={{ color: '#94a3b8' }}>No attachment</span>
@@ -1939,8 +1988,8 @@ export default function AdminPage({
                             </span>
                           </div>
                           <div className="admin-mobile-card-row">
-                            <span className="admin-mobile-card-label">Submitted:</span>
-                            <span className="admin-mobile-card-value">
+                            <span className="admin-mobile-card-label">Logged At:</span>
+                            <span className="admin-mobile-card-value" style={{ color: '#64748b' }}>
                               {new Date(r.created_at || Date.now()).toLocaleDateString()} {new Date(r.created_at || Date.now()).toLocaleTimeString()}
                             </span>
                           </div>
@@ -1955,193 +2004,195 @@ export default function AdminPage({
 
         {/* TAB 2: General Configurations */}
         {activeTab === 'general' && (
-          <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.75rem', padding: '2rem', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.02)' }}>
-            <h3 style={{ fontSize: '1.2rem', fontWeight: 700, marginBottom: '1.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem' }}>Webpage Settings & Strings</h3>
+          <div className="admin-glass-card" style={{ padding: '2rem' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 800, marginBottom: '1.5rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '0.75rem', color: '#0f172a' }}>Webpage Settings & Strings</h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 3fr', gap: '1rem', borderBottom: '1px solid #f1f5f9', paddingBottom: '1.5rem' }}>
-                <div>
-                  <label htmlFor="show_banner" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Show Announcement Banner</label>
+              <div className="admin-form-grid" style={{ borderBottom: '1px solid #f1f5f9', paddingBottom: '1.5rem' }}>
+                <div className="admin-form-group">
+                  <label htmlFor="show_banner">Show Announcement Banner</label>
                   <select
                     id="show_banner"
                     value={info.show_announcement !== 'false' ? 'true' : 'false'}
                     onChange={(e) => handleSaveInfoSetting('show_announcement', e.target.value)}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   >
                     <option value="true">Show Banner</option>
                     <option value="false">Hide Banner</option>
                   </select>
                 </div>
-                <div>
-                  <label htmlFor="banner_txt" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Banner Text</label>
+                <div className="admin-form-group" style={{ gridColumn: 'span 2' }}>
+                  <label htmlFor="banner_txt">Banner Text</label>
                   <input
                     id="banner_txt"
                     type="text"
                     value={info.announcement_text || ''}
                     onChange={(e) => handleSaveInfoSetting('announcement_text', e.target.value)}
                     placeholder="Enter announcement text"
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                <div>
-                  <label htmlFor="ht" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Hero Title</label>
+              <div className="admin-form-grid">
+                <div className="admin-form-group">
+                  <label htmlFor="ht">Hero Title</label>
                   <input
                     id="ht"
                     type="text"
                     value={info.hero_title || ''}
                     onChange={(e) => handleSaveInfoSetting('hero_title', e.target.value)}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
-                <div>
-                  <label htmlFor="hs" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Hero Subtitle</label>
+                <div className="admin-form-group">
+                  <label htmlFor="hs">Hero Subtitle</label>
                   <input
                     id="hs"
                     type="text"
                     value={info.hero_subtitle || ''}
                     onChange={(e) => handleSaveInfoSetting('hero_subtitle', e.target.value)}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                <div>
-                  <label htmlFor="ed" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Event Dates Display</label>
+              <div className="admin-form-grid">
+                <div className="admin-form-group">
+                  <label htmlFor="ed">Event Dates Display</label>
                   <input
                     id="ed"
                     type="text"
                     value={info.event_date_display || ''}
                     onChange={(e) => handleSaveInfoSetting('event_date_display', e.target.value)}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
-                <div>
-                  <label htmlFor="el" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Event Location Display</label>
+                <div className="admin-form-group">
+                  <label htmlFor="el">Event Location Display</label>
                   <input
                     id="el"
                     type="text"
                     value={info.event_location_display || ''}
                     onChange={(e) => handleSaveInfoSetting('event_location_display', e.target.value)}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                <div>
-                  <label htmlFor="cc" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Countdown Target Date (ISO)</label>
+              <div className="admin-form-grid">
+                <div className="admin-form-group">
+                  <label htmlFor="cc">Countdown Target Date (ISO)</label>
                   <input
                     id="cc"
                     type="text"
                     value={info.countdown_target || ''}
                     onChange={(e) => handleSaveInfoSetting('countdown_target', e.target.value)}
                     placeholder="YYYY-MM-DDTHH:MM:SS"
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
-                <div>
-                  <label htmlFor="cl" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Submission / CMT Link</label>
+                <div className="admin-form-group">
+                  <label htmlFor="cl">Submission / CMT Link</label>
                   <input
                     id="cl"
                     type="text"
                     value={info.cmt_link || ''}
                     onChange={(e) => handleSaveInfoSetting('cmt_link', e.target.value)}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                <div>
-                  <label htmlFor="srec_url" style={{ fontWeight: 700, fontSize: '0.85rem' }}>SREC Institutional Link</label>
+              <div className="admin-form-grid">
+                <div className="admin-form-group">
+                  <label htmlFor="srec_url">SREC Institutional Link</label>
                   <input
                     id="srec_url"
                     type="text"
                     value={info.srec_url || ''}
                     onChange={(e) => handleSaveInfoSetting('srec_url', e.target.value)}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
-                <div>
-                  <label htmlFor="ieee_sb_url" style={{ fontWeight: 700, fontSize: '0.85rem' }}>IEEE SB Website Link</label>
+                <div className="admin-form-group">
+                  <label htmlFor="ieee_sb_url">IEEE SB Website Link</label>
                   <input
                     id="ieee_sb_url"
                     type="text"
                     value={info.ieee_sb_url || ''}
                     onChange={(e) => handleSaveInfoSetting('ieee_sb_url', e.target.value)}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="about_conf" style={{ fontWeight: 700, fontSize: '0.85rem' }}>About The Conference Description</label>
+              <div className="admin-form-group">
+                <label htmlFor="about_conf">About The Conference Description</label>
                 <textarea
                   id="about_conf"
                   value={info.about_conference || ''}
                   onChange={(e) => handleSaveInfoSetting('about_conference', e.target.value)}
                   rows={4}
-                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem', fontFamily: 'inherit' }}
+                  className="form-input"
+                  style={{ fontFamily: 'inherit', resize: 'vertical' }}
                 />
               </div>
 
-              <div>
-                <label htmlFor="about_inst" style={{ fontWeight: 700, fontSize: '0.85rem' }}>About Sri Ramakrishna Engineering College</label>
+              <div className="admin-form-group">
+                <label htmlFor="about_inst">About Sri Ramakrishna Engineering College</label>
                 <textarea
                   id="about_inst"
                   value={info.about_institution || ''}
                   onChange={(e) => handleSaveInfoSetting('about_institution', e.target.value)}
                   rows={4}
-                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem', fontFamily: 'inherit' }}
+                  className="form-input"
+                  style={{ fontFamily: 'inherit', resize: 'vertical' }}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', borderTop: '1px solid #f1f5f9', paddingTop: '1.5rem' }}>
-                <div>
-                  <label htmlFor="bank_acc_name" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Bank Beneficiary Name</label>
+              <div className="admin-form-grid" style={{ borderTop: '1px solid #f1f5f9', paddingTop: '1.5rem' }}>
+                <div className="admin-form-group">
+                  <label htmlFor="bank_acc_name">Bank Beneficiary Name</label>
                   <input
                     id="bank_acc_name"
                     type="text"
                     value={info.bank_account_name || ''}
                     onChange={(e) => handleSaveInfoSetting('bank_account_name', e.target.value)}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
-                <div>
-                  <label htmlFor="bank_name_inp" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Bank Name & Branch</label>
+                <div className="admin-form-group">
+                  <label htmlFor="bank_name_inp">Bank Name & Branch</label>
                   <input
                     id="bank_name_inp"
                     type="text"
                     value={info.bank_name || ''}
                     onChange={(e) => handleSaveInfoSetting('bank_name', e.target.value)}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem' }}>
-                <div>
-                  <label htmlFor="bank_acc_no" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Bank Account Number</label>
+              <div className="admin-form-grid">
+                <div className="admin-form-group">
+                  <label htmlFor="bank_acc_no">Bank Account Number</label>
                   <input
                     id="bank_acc_no"
                     type="text"
                     value={info.bank_account_number || ''}
                     onChange={(e) => handleSaveInfoSetting('bank_account_number', e.target.value)}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
-                <div>
-                  <label htmlFor="bank_ifsc" style={{ fontWeight: 700, fontSize: '0.85rem' }}>Bank IFSC Code</label>
+                <div className="admin-form-group">
+                  <label htmlFor="bank_ifsc">Bank IFSC Code</label>
                   <input
                     id="bank_ifsc"
                     type="text"
                     value={info.bank_ifsc_code || ''}
                     onChange={(e) => handleSaveInfoSetting('bank_ifsc_code', e.target.value)}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.375rem', marginTop: '0.25rem' }}
+                    className="form-input"
                   />
                 </div>
               </div>
@@ -2151,114 +2202,153 @@ export default function AdminPage({
 
         {/* TAB 3: Timeline Milestones (NEW CRUD) */}
         {activeTab === 'milestones' && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div style={{ background: '#ffffff', border: '1px solid #e2e8f0', borderRadius: '0.75rem', padding: '1.5rem', boxShadow: '0 4px 6px rgba(0, 0, 0, 0.02)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
-                <h3 style={{ fontSize: '1.1rem', fontWeight: 700, margin: 0 }}>Roadmap Milestone Dates ({importantDates.length})</h3>
-                <button
-                  onClick={() => setEditingMilestone({ event_date: '', title: '', desc: '', sort_order: importantDates.length + 1 })}
-                  style={{
-                    background: '#3b82f6',
-                    color: '#ffffff',
-                    border: 'none',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '0.375rem',
-                    fontSize: '0.8rem',
-                    fontWeight: 700,
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.35rem'
-                  }}
-                >
-                  <Plus size={14} /> Add Milestone
-                </button>
-              </div>
+          <div className="admin-glass-card" style={{ padding: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 800, margin: 0, color: '#0f172a' }}>Roadmap Milestone Dates ({importantDates.length})</h3>
+              <button
+                onClick={() => setEditingMilestone({ event_date: '', title: '', desc: '', sort_order: importantDates.length + 1 })}
+                style={{
+                  background: '#2563eb',
+                  color: '#ffffff',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '0.375rem',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.35rem',
+                  boxShadow: '0 2px 4px rgba(37, 99, 235, 0.1)'
+                }}
+              >
+                <Plus size={14} /> Add Milestone
+              </button>
+            </div>
 
-              {editingMilestone && (
-                <form onSubmit={handleSaveMilestone} style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '0.5rem', padding: '1.5rem', marginBottom: '1.5rem' }}>
-                  <h4 style={{ margin: '0 0 1rem 0', fontWeight: 700 }}>{editingMilestone.id ? 'Edit Milestone' : 'Add New Milestone'}</h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                    <div>
-                      <label htmlFor="ms_date" style={{ fontSize: '0.8rem', fontWeight: 700 }}>Date Display (e.g. 15 Dec 2026)</label>
-                      <input
-                        id="ms_date"
-                        type="text"
-                        required
-                        value={editingMilestone.event_date}
-                        onChange={(e) => setEditingMilestone({ ...editingMilestone, event_date: e.target.value })}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.25rem', marginTop: '0.25rem' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="ms_title" style={{ fontSize: '0.8rem', fontWeight: 700 }}>Milestone Title</label>
-                      <input
-                        id="ms_title"
-                        type="text"
-                        required
-                        value={editingMilestone.title}
-                        onChange={(e) => setEditingMilestone({ ...editingMilestone, title: e.target.value })}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.25rem', marginTop: '0.25rem' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="ms_sort" style={{ fontSize: '0.8rem', fontWeight: 700 }}>Sort Order</label>
-                      <input
-                        id="ms_sort"
-                        type="number"
-                        required
-                        value={editingMilestone.sort_order || 1}
-                        onChange={(e) => setEditingMilestone({ ...editingMilestone, sort_order: Number(e.target.value) })}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.25rem', marginTop: '0.25rem' }}
-                      />
-                    </div>
-                  </div>
-                  <div style={{ marginBottom: '1rem' }}>
-                    <label htmlFor="ms_desc" style={{ fontSize: '0.8rem', fontWeight: 700 }}>Short Description</label>
+            {editingMilestone && (
+              <form onSubmit={handleSaveMilestone} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '0.5rem', padding: '1.25rem', marginBottom: '1.5rem' }}>
+                <h4 style={{ margin: '0 0 1rem 0', fontWeight: 800, fontSize: '0.95rem' }}>{editingMilestone.id ? 'Edit Milestone' : 'Add New Milestone'}</h4>
+                <div className="admin-form-grid" style={{ marginBottom: '1rem' }}>
+                  <div className="admin-form-group">
+                    <label htmlFor="ms_date">Date Display (e.g. 15 Dec 2026)</label>
                     <input
-                      id="ms_desc"
+                      id="ms_date"
                       type="text"
-                      value={editingMilestone.desc || ''}
-                      onChange={(e) => setEditingMilestone({ ...editingMilestone, desc: e.target.value })}
-                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #cbd5e1', borderRadius: '0.25rem', marginTop: '0.25rem' }}
+                      required
+                      value={editingMilestone.event_date}
+                      onChange={(e) => setEditingMilestone({ ...editingMilestone, event_date: e.target.value })}
+                      className="form-input"
                     />
                   </div>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
-                    <button type="submit" className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>Save Milestone</button>
-                    <button type="button" onClick={() => setEditingMilestone(null)} className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>Cancel</button>
+                  <div className="admin-form-group" style={{ gridColumn: 'span 2' }}>
+                    <label htmlFor="ms_title">Milestone Title</label>
+                    <input
+                      id="ms_title"
+                      type="text"
+                      required
+                      value={editingMilestone.title}
+                      onChange={(e) => setEditingMilestone({ ...editingMilestone, title: e.target.value })}
+                      className="form-input"
+                    />
                   </div>
-                </form>
-              )}
+                  <div className="admin-form-group">
+                    <label htmlFor="ms_sort">Sort Order</label>
+                    <input
+                      id="ms_sort"
+                      type="number"
+                      required
+                      value={editingMilestone.sort_order || 1}
+                      onChange={(e) => setEditingMilestone({ ...editingMilestone, sort_order: Number(e.target.value) })}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+                <div className="admin-form-group" style={{ marginBottom: '1.25rem' }}>
+                  <label htmlFor="ms_desc">Short Description</label>
+                  <input
+                    id="ms_desc"
+                    type="text"
+                    value={editingMilestone.desc || ''}
+                    onChange={(e) => setEditingMilestone({ ...editingMilestone, desc: e.target.value })}
+                    className="form-input"
+                  />
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button type="submit" className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>Save</button>
+                  <button type="button" onClick={() => setEditingMilestone(null)} className="btn btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.8rem' }}>Cancel</button>
+                </div>
+              </form>
+            )}
 
-              <div style={{ overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '2px solid #e2e8f0', color: '#475569' }}>
-                      <th style={{ padding: '0.5rem' }}>Order</th>
-                      <th style={{ padding: '0.5rem' }}>Date Display</th>
-                      <th style={{ padding: '0.5rem' }}>Title</th>
-                      <th style={{ padding: '0.5rem' }}>Description</th>
-                      <th style={{ padding: '0.5rem', textAlign: 'center' }}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {importantDates.map((item, idx) => (
+            {/* Desktop Table View */}
+            <div className="admin-desktop-view" style={{ border: '1px solid #e2e8f0', borderRadius: '0.5rem', overflow: 'hidden' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem', textAlign: 'left', background: '#ffffff' }}>
+                <thead>
+                  <tr style={{ borderBottom: '2px solid #e2e8f0', background: '#f8fafc', color: '#475569', fontWeight: 700 }}>
+                    <th style={{ padding: '0.75rem' }}>Order</th>
+                    <th style={{ padding: '0.75rem' }}>Date Display</th>
+                    <th style={{ padding: '0.75rem' }}>Title</th>
+                    <th style={{ padding: '0.75rem' }}>Description</th>
+                    <th style={{ padding: '0.75rem', textAlign: 'center' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {importantDates
+                    .filter(item => 
+                      item.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                      item.event_date?.toLowerCase().includes(searchTerm.toLowerCase())
+                    )
+                    .map((item, idx) => (
                       <tr key={item.id || idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                        <td style={{ padding: '0.75rem 0.5rem', fontWeight: 700 }}>{item.sort_order}</td>
-                        <td style={{ padding: '0.75rem 0.5rem', color: '#0f52ba', fontWeight: 600 }}>{item.event_date}</td>
-                        <td style={{ padding: '0.75rem 0.5rem', fontWeight: 700 }}>{item.title}</td>
-                        <td style={{ padding: '0.75rem 0.5rem', color: '#64748b' }}>{item.desc}</td>
-                        <td style={{ padding: '0.75rem 0.5rem', textAlign: 'center' }}>
+                        <td style={{ padding: '0.85rem 0.75rem', fontWeight: 700, color: '#64748b' }}>{item.sort_order}</td>
+                        <td style={{ padding: '0.85rem 0.75rem', color: '#2563eb', fontWeight: 700 }}>{item.event_date}</td>
+                        <td style={{ padding: '0.85rem 0.75rem', fontWeight: 700, color: '#0f172a' }}>{item.title}</td>
+                        <td style={{ padding: '0.85rem 0.75rem', color: '#64748b' }}>{item.desc}</td>
+                        <td style={{ padding: '0.85rem 0.75rem', textAlign: 'center' }}>
                           <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
-                            <button onClick={() => setEditingMilestone(item)} style={{ background: 'none', border: 'none', color: '#3b82f6', cursor: 'pointer' }}><Edit size={14} /></button>
-                            <button onClick={() => handleDeleteMilestone(item.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}><Trash2 size={14} /></button>
+                            <button onClick={() => setEditingMilestone(item)} style={{ background: 'none', border: 'none', color: '#2563eb', cursor: 'pointer', padding: '0.25rem' }} title="Edit"><Edit size={14} /></button>
+                            <button onClick={() => handleDeleteMilestone(item.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.25rem' }} title="Delete"><Trash2 size={14} /></button>
                           </div>
                         </td>
                       </tr>
                     ))}
-                  </tbody>
-                </table>
-              </div>
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Card List View */}
+            <div className="admin-mobile-view admin-mobile-card-list">
+              {importantDates
+                .filter(item => 
+                  item.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                  item.event_date?.toLowerCase().includes(searchTerm.toLowerCase())
+                )
+                .map((item, idx) => (
+                  <div key={item.id || idx} className="admin-mobile-card">
+                    <div className="admin-mobile-card-header">
+                      <span style={{ fontWeight: 800, color: '#2563eb', fontSize: '0.85rem' }}>Sort Order: {item.sort_order}</span>
+                      <div style={{ display: 'flex', gap: '0.5rem' }}>
+                        <button onClick={() => setEditingMilestone(item)} style={{ background: 'none', border: 'none', color: '#2563eb', cursor: 'pointer', padding: '0.25rem' }}><Edit size={15} /></button>
+                        <button onClick={() => handleDeleteMilestone(item.id)} style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.25rem' }}><Trash2 size={15} /></button>
+                      </div>
+                    </div>
+                    <div className="admin-mobile-card-body">
+                      <div className="admin-mobile-card-row">
+                        <span className="admin-mobile-card-label">Date Display:</span>
+                        <span className="admin-mobile-card-value" style={{ color: '#2563eb', fontWeight: 700 }}>{item.event_date}</span>
+                      </div>
+                      <div className="admin-mobile-card-row">
+                        <span className="admin-mobile-card-label">Title:</span>
+                        <span className="admin-mobile-card-value" style={{ fontWeight: 700 }}>{item.title}</span>
+                      </div>
+                      <div className="admin-mobile-card-row">
+                        <span className="admin-mobile-card-label">Description:</span>
+                        <span className="admin-mobile-card-value" style={{ color: '#64748b' }}>{item.desc || 'N/A'}</span>
+                      </div>
+                    </div>
+                  </div>
+                ))}
             </div>
           </div>
         )}
@@ -3158,6 +3248,29 @@ export default function AdminPage({
           </div>
         )}
       </main>
+
+      {/* Mobile Bottom Tab Bar */}
+      <div className="admin-mobile-tabbar">
+        {tabs.map((tab) => {
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => {
+                setActiveTab(tab.id);
+                setSearchTerm('');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className={`admin-mobile-tabbar-btn ${isActive ? 'active' : ''}`}
+            >
+              {tab.icon}
+              <span>{tab.label.split(' ')[0]}</span>
+            </button>
+          );
+        })}
+      </div>
+
+      </div> {/* closes className="admin-main-container" */}
 
       {/* Image Preview Modal Overlay Container */}
       {previewImage && (
